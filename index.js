@@ -26,11 +26,13 @@ Sempre finalize a mensagem de forma engajadora.`;
 
 async function gerarRespostaGemini(mensagemCliente) {
   try {
-    const model = genAI.getGenerativeModel({ 
-     model: "gemini-pro",
-      systemInstruction: systemInstruction
-    });
-    const result = await model.generateContent(mensagemCliente);
+    // Chamamos o modelo puro, sem a configuração que estava dando erro
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // O Truque: Injetamos a identidade da SDR "escondida" junto com a mensagem do cliente
+    const promptCompleto = `${systemInstruction}\n\nO cliente enviou a seguinte mensagem no WhatsApp:\n"${mensagemCliente}"\n\nResponda agora como a SDR (lembre-se de NUNCA dar preços):`;
+    
+    const result = await model.generateContent(promptCompleto);
     return result.response.text();
   } catch (error) {
     console.error("Erro no Gemini:", error);
